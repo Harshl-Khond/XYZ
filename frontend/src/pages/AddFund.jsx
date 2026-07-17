@@ -6,7 +6,7 @@ function AddFund() {
   const admin = JSON.parse(localStorage.getItem("user"));
   const admin_email = admin?.email;
 
-  const [form, setForm] = useState({ date: "", amount: "", description: "" });
+  const [form, setForm] = useState({ date: "", amount: "", description: "", payment_method: "Cash" });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -18,7 +18,7 @@ function AddFund() {
     try {
       const res = await api.post("/add-fund", { ...form, admin_email });
       setMessage(res.data.message);
-      setForm({ date: "", amount: "", description: "" });
+      setForm({ date: "", amount: "", description: "", payment_method: "Cash" });
     } catch (err) {
       if (err.response?.status === 401) { setMessage("Session expired."); localStorage.clear(); window.location.href = "/login"; return; }
       setMessage("Failed to add fund");
@@ -44,9 +44,17 @@ function AddFund() {
               <input type="number" name="amount" placeholder="Enter amount" value={form.amount} onChange={handleChange} className="input" required />
             </div>
             <div>
+              <label style={{ display: "block", marginBottom: "5px", fontSize: "0.82rem", fontWeight: 500, color: "var(--navy-light)" }}>Payment Method</label>
+              <select name="payment_method" value={form.payment_method} onChange={handleChange} className="input" required>
+                <option value="Cash">Cash</option>
+                <option value="Online">Online</option>
+              </select>
+            </div>
+            <div>
               <label style={{ display: "block", marginBottom: "5px", fontSize: "0.82rem", fontWeight: 500, color: "var(--navy-light)" }}>Description</label>
               <input type="text" name="description" placeholder="Brief description" value={form.description} onChange={handleChange} className="input" required />
             </div>
+
             <button type="submit" className="btn btn-primary" style={{ width: "100%", padding: "11px", opacity: loading ? 0.7 : 1 }} disabled={loading}>
               {loading ? "Adding..." : "Add Fund"}
             </button>

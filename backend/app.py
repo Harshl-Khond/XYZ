@@ -286,6 +286,7 @@ def add_fund():
         amount = float(data.get("amount"))
         description = data.get("description")
         admin_email = data.get("admin_email")
+        payment_method = data.get("payment_method", "Cash")
 
         if not all([date, amount, admin_email]):
             return jsonify({"error": "Missing fields"}), 400
@@ -294,7 +295,8 @@ def add_fund():
             "date": date,
             "amount": amount,
             "description": description,
-            "admin_email": admin_email
+            "admin_email": admin_email,
+            "payment_method": payment_method
         })
 
         balance_doc = db.collection("fund_balance").document("main").get()
@@ -337,6 +339,7 @@ def get_all_funds():
                 "date": data.get("date"),
                 "amount": data.get("amount"),
                 "description": data.get("description"),
+                "payment_method": data.get("payment_method", "Cash"),
                 "admin_name": user_cache.get(admin_email, "Unknown")
             })
 

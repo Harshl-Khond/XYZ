@@ -65,6 +65,7 @@ function FundHistory() {
                 <tr>
                   <th>Date</th>
                   <th>Amount</th>
+                  <th>Method</th>
                   <th>Description</th>
                   <th>Added By</th>
                 </tr>
@@ -75,12 +76,17 @@ function FundHistory() {
                     <tr key={f.id}>
                       <td>{f.date}</td>
                       <td style={{ fontWeight: 600, color: "var(--teal)" }}>₹{f.amount}</td>
+                      <td>
+                        <span className={`badge ${f.payment_method?.toLowerCase() === "online" ? "badge-online" : "badge-cash"}`}>
+                          {f.payment_method || "Cash"}
+                        </span>
+                      </td>
                       <td>{f.description || "—"}</td>
                       <td>{f.admin_name}</td>
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan="4" style={{ textAlign: "center", padding: "32px", color: "var(--slate)" }}>No funds found</td></tr>
+                  <tr><td colSpan="5" style={{ textAlign: "center", padding: "32px", color: "var(--slate)" }}>No funds found</td></tr>
                 )}
               </tbody>
             </table>
