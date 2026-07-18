@@ -39,3 +39,4 @@ pnpm-debug.log*
 *.tmp
 *.bak
 *.old
+.vercel

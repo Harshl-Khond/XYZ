@@ -7,7 +7,7 @@ function Expense() {
   const user = JSON.parse(localStorage.getItem("user"));
   const email = user?.email;
 
-  const [form, setForm] = useState({ date: "", description: "", amount: "" });
+  const [form, setForm] = useState({ date: "", description: "", amount: "", payment_method: "Cash" });
   const [billImageBase64, setBillImageBase64] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -48,7 +48,7 @@ function Expense() {
     try {
       const res = await api.post("/add-expense", { ...form, bill_image: billImageBase64 || "", email });
       setMessage(res.data.message);
-      setForm({ date: "", description: "", amount: "" });
+      setForm({ date: "", description: "", amount: "", payment_method: "Cash" });
       setBillImageBase64("");
     } catch (err) {
       if (err.response?.status === 401) { setMessage("Session expired."); localStorage.clear(); window.location.href = "/login"; return; }
@@ -77,6 +77,14 @@ function Expense() {
             <div>
               <label style={{ display: "block", marginBottom: "5px", fontSize: "0.82rem", fontWeight: 500, color: "var(--navy-light)" }}>Amount (₹)</label>
               <input type="number" name="amount" value={form.amount} placeholder="Enter amount" onChange={handleChange} className="input" required />
+            </div>
+
+            <div>
+              <label style={{ display: "block", marginBottom: "5px", fontSize: "0.82rem", fontWeight: 500, color: "var(--navy-light)" }}>Payment Method</label>
+              <select name="payment_method" value={form.payment_method} onChange={handleChange} className="input" required>
+                <option value="Cash">Cash</option>
+                <option value="Online">Online</option>
+              </select>
             </div>
 
             {/* File Upload */}

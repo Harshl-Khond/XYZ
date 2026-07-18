@@ -15,7 +15,7 @@ function ShowExpenses() {
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editExpense, setEditExpense] = useState(null);
-  const [editForm, setEditForm] = useState({ description: "", amount: "", date: "" });
+  const [editForm, setEditForm] = useState({ description: "", amount: "", date: "", payment_method: "Cash" });
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewData, setPreviewData] = useState(null);
@@ -46,7 +46,7 @@ function ShowExpenses() {
 
   const openEditModal = (exp) => {
     setEditExpense(exp);
-    setEditForm({ description: exp.description, amount: exp.amount, date: exp.date });
+    setEditForm({ description: exp.description, amount: exp.amount, date: exp.date, payment_method: exp.payment_method || "Cash" });
     setEditModalOpen(true);
   };
 
@@ -97,6 +97,13 @@ function ShowExpenses() {
               <input value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} className="input" placeholder="Description" />
               <input type="number" value={editForm.amount} onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })} className="input" placeholder="Amount" />
               <input type="date" value={editForm.date} onChange={(e) => setEditForm({ ...editForm, date: e.target.value })} className="input" />
+              <div>
+                <label style={{ display: "block", marginBottom: "5px", fontSize: "0.82rem", fontWeight: 500, color: "var(--navy-light)" }}>Payment Method</label>
+                <select value={editForm.payment_method} onChange={(e) => setEditForm({ ...editForm, payment_method: e.target.value })} className="input" required>
+                  <option value="Cash">Cash</option>
+                  <option value="Online">Online</option>
+                </select>
+              </div>
               <button type="submit" className="btn btn-primary" style={{ width: "100%" }}>Save Changes</button>
             </form>
           </div>
@@ -144,6 +151,7 @@ function ShowExpenses() {
                   <th>Date</th>
                   <th>Description</th>
                   <th>Amount</th>
+                  <th>Payment Method</th>
                   <th>Bill</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -156,6 +164,7 @@ function ShowExpenses() {
                       <td style={{ whiteSpace: "nowrap" }}>{exp.date}</td>
                       <td>{exp.description}</td>
                       <td style={{ fontWeight: 600 }}>₹{exp.amount}</td>
+                      <td>{exp.payment_method || "Cash"}</td>
                       <td>
                         {exp.bill_image ? (
                           exp.bill_image.startsWith("data:application/pdf") ? (
@@ -186,7 +195,7 @@ function ShowExpenses() {
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan="6" style={{ textAlign: "center", padding: "32px", color: "var(--slate)" }}>No expenses found</td></tr>
+                  <tr><td colSpan="7" style={{ textAlign: "center", padding: "32px", color: "var(--slate)" }}>No expenses found</td></tr>
                 )}
               </tbody>
             </table>

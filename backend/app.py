@@ -167,7 +167,8 @@ def add_expense():
             "description": description,
             "amount": amount,
             "email": email,
-            "status": "pending"
+            "status": "pending",
+            "payment_method": data.get("payment_method", "Cash")
         }
         if bill_image_base64:
             expense_data["bill_image"] = bill_image_base64
@@ -265,6 +266,7 @@ def get_expenses(email):
             data = exp.to_dict()
             data["id"] = exp.id
             data.setdefault("status", "pending")
+            data.setdefault("payment_method", "Cash")
             expenses.append(data)
 
         return jsonify({"expenses": expenses}), 200
@@ -481,6 +483,7 @@ def get_employee_summary(email):
                 data = exp.to_dict()
                 data["id"] = exp.id
                 data.setdefault("status", "pending")
+                data.setdefault("payment_method", "Cash")
                 amount = float(data.get("amount", 0))
                 
                 actual_submitted += amount
@@ -509,6 +512,7 @@ def get_employee_summary(email):
                 data = exp.to_dict()
                 data["id"] = exp.id
                 data.setdefault("status", "pending")
+                data.setdefault("payment_method", "Cash")
                 expenses_list.append(data)
             
             total_count = stats_data.get("total_submitted_count", 0)
@@ -562,7 +566,8 @@ def admin_get_all_expenses():
                 "amount": data.get("amount"),
                 "date": data.get("date"),
                 "bill_image": data.get("bill_image"),
-                "status": data.get("status", "pending")
+                "status": data.get("status", "pending"),
+                "payment_method": data.get("payment_method", "Cash")
             })
 
         return jsonify({"expenses": expenses}), 200
@@ -641,6 +646,8 @@ def update_expense(expense_id):
             update_fields["date"] = data["date"]
         if data.get("bill_image"):
             update_fields["bill_image"] = data["bill_image"]
+        if data.get("payment_method"):
+            update_fields["payment_method"] = data["payment_method"]
 
         if not update_fields:
             return jsonify({"error": "No fields to update"}), 400
@@ -720,7 +727,7 @@ def export_expenses_excel():
         ws = wb.active
         ws.title = "Expenses"
 
-        ws.append(["Employee Name", "Description", "Amount", "Date", "Status"])
+        ws.append(["Employee Name", "Description", "Amount", "Date", "Payment Method", "Status"])
 
         # Collect all expenses and sort by date
         all_rows = []
@@ -733,6 +740,7 @@ def export_expenses_excel():
                 "description": data.get("description"),
                 "amount": data.get("amount"),
                 "date": data.get("date", ""),
+                "payment_method": data.get("payment_method", "Cash"),
                 "status": data.get("status", "pending")
             })
 
@@ -744,6 +752,7 @@ def export_expenses_excel():
                 row["description"],
                 row["amount"],
                 row["date"],
+                row["payment_method"],
                 row["status"]
             ])
 
