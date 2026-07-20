@@ -605,6 +605,51 @@ def admin_employee_expenses_stats():
         return jsonify({"error": "Failed to fetch employee stats"}), 500
 
 
+# ------------------- ADMIN MONTHLY EXPENSES STATS -------------------
+@app.route("/admin/monthly-expenses-stats", methods=["GET"])
+def admin_monthly_expenses_stats():
+    valid, sess, code = validate_session(request.args)
+    if not valid:
+        return sess, code
+    
+    if sess.get("role") != "admin":
+        return jsonify({"error": "Admin access required"}), 403
+
+    try:
+        import datetime
+        expenses_ref = db.collection("expenses").stream()
+        
+        monthly_data = {}
+        for exp_doc in expenses_ref:
+            exp = exp_doc.to_dict()
+            date_str = exp.get("date")
+            amount = float(exp.get("amount", 0))
+            if not date_str:
+                continue
+            try:
+                # Parse date string which is expected to be "YYYY-MM-DD"
+                dt = datetime.datetime.strptime(date_str[:10], "%Y-%m-%d")
+                sort_key = dt.strftime("%Y-%m")
+                month_name = dt.strftime("%b %Y") # e.g. "Jul 2026"
+            except Exception:
+                continue
+            
+            if sort_key not in monthly_data:
+                monthly_data[sort_key] = {
+                    "month": month_name,
+                    "total_expense": 0.0,
+                    "sort_key": sort_key
+                }
+            monthly_data[sort_key]["total_expense"] += amount
+            
+        # Sort chronologically
+        sorted_stats = sorted(monthly_data.values(), key=lambda x: x["sort_key"])
+        return jsonify(sorted_stats), 200
+    except Exception as e:
+        print("ERROR:", e)
+        return jsonify({"error": "Failed to fetch monthly stats"}), 500
+
+
 # ------------------- UPDATE EXPENSE -------------------
 @app.route("/update-expense/<expense_id>", methods=["PUT"])
 def update_expense(expense_id):

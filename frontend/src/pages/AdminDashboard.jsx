@@ -6,17 +6,17 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState({ total_fund: 0, total_expenses: 0, balance: 0, pending_count: 0 });
-  const [employeeStats, setEmployeeStats] = useState([]);
+  const [monthlyStats, setMonthlyStats] = useState([]);
   const user = JSON.parse(localStorage.getItem("user"));
 
   const loadData = async () => {
     try {
       const [summaryRes, statsRes] = await Promise.all([
         api.get("/get-summary"),
-        api.get("/admin/employee-expenses-stats")
+        api.get("/admin/monthly-expenses-stats")
       ]);
       setSummary(summaryRes.data);
-      setEmployeeStats(statsRes.data);
+      setMonthlyStats(statsRes.data);
     } catch (err) {
       console.log("Error loading dashboard data:", err);
     } finally {
@@ -79,17 +79,17 @@ function AdminDashboard() {
         {/* Bar Chart section */}
         <div className="chart-container animate-in" style={{ animationDelay: '0.1s' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-            <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--navy)" }}>📊 Employee Expenses Comparison</h2>
+            <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--navy)" }}>📊 Month-wise Total Expenses</h2>
             <div style={{ fontSize: '0.8rem', color: 'var(--slate)', fontWeight: 500 }}>Total Submitted Amount</div>
           </div>
 
           <div style={{ width: '100%', height: 350 }}>
-            {employeeStats.length > 0 ? (
+            {monthlyStats.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={employeeStats} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
+                <BarChart data={monthlyStats} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                   <XAxis
-                    dataKey="name"
+                    dataKey="month"
                     axisLine={false}
                     tickLine={false}
                     tick={{ fill: '#64748b', fontSize: 13, fontWeight: 500 }}
@@ -106,7 +106,7 @@ function AdminDashboard() {
                     formatter={(value) => [`₹${value}`, 'Total Expense']}
                   />
                   <Bar dataKey="total_expense" radius={[10, 10, 0, 0]} barSize={45}>
-                    {employeeStats.map((entry, index) => (
+                    {monthlyStats.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Bar>
